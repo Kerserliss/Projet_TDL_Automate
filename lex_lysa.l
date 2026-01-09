@@ -6,12 +6,8 @@
 %}
 
 %% 
-// Ordre de priorite - Operateur
-[(] { return PO;}
-[)] { return PF;}
-[*] { return ETOILE; }
-[.] { return CONCATENATION;}
-[+] { return OU; }
+// Lettre
+[a-c] { return LETTRE;}
 [ \t] {;} // ignore les espaces 
 [\n] { return LIGNE;}
 
