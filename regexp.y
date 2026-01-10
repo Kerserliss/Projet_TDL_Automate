@@ -47,9 +47,6 @@ Programme* Programme_G = Initprogramme();
 
 //Grammaire 
 
-%union {
-	char* str;
-}
 %token <str> LETTRE 
 %token PLUS POINT ETOILE PAR_O PAR_F LIGNE
 
@@ -61,7 +58,7 @@ Programme* Programme_G = Initprogramme();
 %right ETOILE
 
 instruction : 
-	expression {
+	expression LIGNE expression {
 		char buffer[100];
 		sprintf(buffer, "resultat = %s\n", $1);
 		Add_to_Prog(Programme_G, buffer)
@@ -73,79 +70,45 @@ expression :
 	}
 	|
 	expression ETOILE {
-		char nom[20];
-		sprintf(nom, "a%d", numero);
-		numero++;
-
-		char buffer[200];
-		sprintf(buffer, "%s = %s\n", nom, $1);
-		Add_to_Prog(Programme_G, buffer);
-
 		char etoile[20];
 		sprintf(etoile, "a%d", numero);
 		numero++;
 
-		sprintf(buffer, "%s = etoile(%s)\n, etoile, nom);
+		sprintf(buffer, "%s = etoile(a%d)\n", etoile,$1 );
 		Add_to_Prog(Programme_G, buffer);
 
-		$$ = strdup(etoile);
+		$$ = numero-1;
 	}
 	|
 	expression POINT expression {
-		char gauche[20];
-		sprintf(gauche, "a%d", numero);
-		numero++;
-
-		char buffer[200];
-		sprintf(buffer, "%s = %s\n", gauche, $1);
-		Add_to_Prog(Programme_G, buffer);
-
-		char droite[20];
-		sprintf(droite, "a%d", numero);
-		numero++;
-
-		sprintf(buffer, "%s = %s\n", droite, $3);
-		Add_to_Prog(Programme_G, buffer);
 
 		char merge[20];
 		sprintf(merge, "a%d", numero);
 		numero++;
 
-		spintf(buffer, "%s = concatenation(%s, %s)\n, merge, gauche, droite);
+		spintf(buffer, "%s = concatenation(%s, %s)\n, merge, $1, $2);
 		Add_to_Prog(Programme_G, buffer);
 
-		$$ = strdup(merge);
+		$$ = numero -1;
 	}
 	| 
 	expression PLUS expression {
-		char resultat[20];
-		sprintf(resultat, "a%d", numero);
-		numero++;
-
-		char buffer[200];
-		sprintf(buffer, "%s = %s\n", resultat, $1);
-		Add_to_Prog(Programme_G, buffer);
-
-		char expr[20];
-		sprintf(expr, "a%d", numero);
-		numero++;
-
-		sprintf(buffer, "%s = %s\n", expr, $3);
-		Add_to_Prog(Programme_G, buffer);
 
 		char add[20];
 		sprintf(add, "a%d", numero);
 		numero++;
 
-		sprintf(buffer, "%s = union(%s, %s)\n", add, resultat, expr);
+		sprintf(buffer, "%s = union(%s, %s)\n", add,$1, $2);
 		Add_to_Prog(Programme_G, buffer);
-		$$ = strdup(add);
+		$$ = numero-1;
 	}
 	|
 	LETTRE {
 		char buffer[50];
-		sprintf(buffer, "automate(\"%s\")", $1);
-		$$ = strdup(buffer);
+		sprintf(buffer, "a%d = automate(\"%s\")",numero, $1);
+		Add_to_Prog(Programme_G, buffer);
+		numero++;
+		$$ = numero - 1;  // On renvoie le numero precedent
 	}
 	;
 
