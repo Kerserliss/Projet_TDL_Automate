@@ -1,0 +1,5 @@
+#define PLUS 101
+#define POINT 102
+#define ETOILE 103
+#define PAR_O 104
+#define PAR_F 105
