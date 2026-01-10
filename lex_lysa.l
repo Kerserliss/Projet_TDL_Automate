@@ -10,6 +10,12 @@
 [a-c] { return LETTRE;}
 [ \t] {;} // ignore les espaces 
 [\n] { return LIGNE;}
+// Opérateur 
+"+"    { return PLUS ;}
+"."    { return POINT ; }
+"*"    { return ETOILE ; }
+"("    {return PAR_O ;}
+")"    {return PAR_F;}
 
 %%
 // Juste pour tester avant.
