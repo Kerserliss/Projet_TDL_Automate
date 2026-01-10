@@ -43,3 +43,56 @@ Programme* Add_to_Prog(Programme* p, char* add){
 Programme* Programme_G = Initprogramme();
 
 %}
+
+
+//Grammaire 
+%token LETTRE LIGNE
+%token PLUS POINT ETOILE PAR_O PAR_F
+
+
+%left PLUS
+%left POINT
+%right ETOILE
+
+//Déclarations 
+%%
+ligne : 
+	S LIGNE {
+		res_final = $1 ;
+	}
+
+expr :
+	PAR_O expr PAR_F {
+		$$ = parenth($2);
+		free($2);
+	}
+	|
+	expr ETOILE {
+		char * chaine = malloc(strlen($1) + 2);
+		sprintf(chaine, "%s", $1);
+		free($1);
+		$$ = chaine; 
+	}
+	|
+
+	expr PLUS expr {
+		char * chaine = malloc(strlen($1) + strlen($3) + 2);
+		sprintf(chaine, "%s+%s, $1, $3);
+		free($1); free($3);
+		$$ = chaine;
+	}
+	|
+	expr POINT expr {
+		char * chaine = malloc(strlen($1) + strlen($3) +2);
+		sprintf(chaine, "%s.s%", $1, $3);
+		$$ = chaine;
+	}
+	|
+	LETTRE {
+		$$ = yylval("a", "b", "c");
+	}
+%%
+
+
+
+
