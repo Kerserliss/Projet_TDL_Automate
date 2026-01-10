@@ -81,6 +81,10 @@ def union(a1, a2):
 def etoile(a):
     """Retourne l'automate qui reconnaît l'étoile de Kleene du 
     langage reconnu par l'automate a""" 
+    # Inspiration autre fonction du code, on évite les effets de bord ?
+    a = cp.deepcopy(a)
+    for etat in a.final :
+        a.ajoute_transition(etat,'E',[0])
     return a
 
 
@@ -142,7 +146,29 @@ def determinisation(a):
         la construction garantit que tous les états sont accessibles
         automate d'entrée sans epsilon-transitions
     """        
-    return a
+    det_a = automate() # On cree l'automate deterministe
+    liste_ensemble = [[0]]
+    num_etat = 0
+    if 0 in a.final :
+        det_a.final = [0]
+    
+    while num_etat < len(liste_ensemble) :
+        for lettre in 'abc':
+            etats_decouverts = []
+            for q in liste_ensemble[num_etat] :
+                if (q,lettre) in a.transition.keys() :
+                    etats_decouverts += a.transition[(q,lettre)]
+            etats_decouverts = sorted(list(set(etats_decouverts))) # Pour éviter les doublons, et pour tout avoir toujours dans le même prdre
+            if etats_decouverts : # Verifications qu'elle est pas libre 
+                if not etats_decouverts in liste_ensemble : # On verifie qu'elle est pas vide
+                    liste_ensemble.append(etats_decouverts)
+                    if any([x in a.final for x in etats_decouverts]) : # Liste par comprehension pour gerer avec le mot clé any si un etat decouvert est dans les etats finaux de a
+                        det_a.final.append(liste_ensemble.index(etats_decouverts))
+                det_a.ajoute_transition(num_etat,lettre,[liste_ensemble.index(etats_decouverts),])
+        num_etat += 1
+    
+    det_a.n = num_etat
+    return det_a
     
     
 def completion(a):
@@ -223,9 +249,11 @@ def egal(a1, a2):
     """ retourne True si a1 et a2 sont isomorphes
         a1 et a2 doivent être minimaux
     """
+    if a1.n != a2.n :
+        return False
     return True
 
 
 
 # TESTS
-# à écrire
+# à écrire  
