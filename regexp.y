@@ -46,53 +46,109 @@ Programme* Programme_G = Initprogramme();
 
 
 //Grammaire 
-%token LETTRE LIGNE
-%token PLUS POINT ETOILE PAR_O PAR_F
+
+%union {
+	char* str;
+}
+%token <str> LETTRE 
+%token PLUS POINT ETOILE PAR_O PAR_F LIGNE
+
+%type <str> expression
 
 
 %left PLUS
 %left POINT
 %right ETOILE
 
-//Déclarations 
-%%
-ligne : 
-	S LIGNE {
-		res_final = $1 ;
-	}
+instruction : 
+	expression {
+		char buffer[100];
+		sprintf(buffer, "resultat = %s\n", $1);
+		Add_to_Prog(Programme_G, buffer)
+	};
 
-expr :
-	PAR_O expr PAR_F {
-		$$ = parenth($2);
-		free($2);
+expression : 
+	PAR_O expression PAR_F {
+		$$ = $2;
 	}
 	|
-	expr ETOILE {
-		char * chaine = malloc(strlen($1) + 2);
-		sprintf(chaine, "%s", $1);
-		free($1);
-		$$ = chaine; 
-	}
-	|
+	expression ETOILE {
+		char nom[20];
+		sprintf(nom, "a%d", numero);
+		numero++;
 
-	expr PLUS expr {
-		char * chaine = malloc(strlen($1) + strlen($3) + 2);
-		sprintf(chaine, "%s+%s, $1, $3);
-		free($1); free($3);
-		$$ = chaine;
+		char buffer[200];
+		sprintf(buffer, "%s = %s\n", nom, $1);
+		Add_to_Prog(Programme_G, buffer);
+
+		char etoile[20];
+		sprintf(etoile, "a%d", numero);
+		numero++;
+
+		sprintf(buffer, "%s = etoile(%s)\n, etoile, nom);
+		Add_to_Prog(Programme_G, buffer);
+
+		$$ = strdup(etoile);
 	}
 	|
-	expr POINT expr {
-		char * chaine = malloc(strlen($1) + strlen($3) +2);
-		sprintf(chaine, "%s.s%", $1, $3);
-		$$ = chaine;
+	expression POINT expression {
+		char gauche[20];
+		sprintf(gauche, "a%d", numero);
+		numero++;
+
+		char buffer[200];
+		sprintf(buffer, "%s = %s\n", gauche, $1);
+		Add_to_Prog(Programme_G, buffer);
+
+		char droite[20];
+		sprintf(droite, "a%d", numero);
+		numero++;
+
+		sprintf(buffer, "%s = %s\n", droite, $3);
+		Add_to_Prog(Programme_G, buffer);
+
+		char merge[20];
+		sprintf(merge, "a%d", numero);
+		numero++;
+
+		spintf(buffer, "%s = concatenation(%s, %s)\n, merge, gauche, droite);
+		Add_to_Prog(Programme_G, buffer);
+
+		$$ = strdup(merge);
+	}
+	| 
+	expression PLUS expression {
+		char resultat[20];
+		sprintf(resultat, "a%d", numero);
+		numero++;
+
+		char buffer[200];
+		sprintf(buffer, "%s = %s\n", resultat, $1);
+		Add_to_Prog(Programme_G, buffer);
+
+		char expr[20];
+		sprintf(expr, "a%d", numero);
+		numero++;
+
+		sprintf(buffer, "%s = %s\n", expr, $3);
+		Add_to_Prog(Programme_G, buffer);
+
+		char add[20];
+		sprintf(add, "a%d", numero);
+		numero++;
+
+		sprintf(buffer, "%s = union(%s, %s)\n", add, resultat, expr);
+		Add_to_Prog(Programme_G, buffer);
+		$$ = strdup(add);
 	}
 	|
 	LETTRE {
-		$$ = yylval("a", "b", "c");
+		char buffer[50];
+		sprintf(buffer, "automate(\"%s\")", $1);
+		$$ = strdup(buffer);
 	}
-%%
+	;
 
-
+	
 
 
