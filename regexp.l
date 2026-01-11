@@ -6,11 +6,11 @@
 %}
 
 %% 
-// Lettre
-[a-c] { return LETTRE;}
+[a-c] { yylval.str = strdup(yytext); return LETTRE;}
 [ \t] {;} // ignore les espaces 
 [\n] { return LIGNE;}
-// Opérateur 
+
+
 "+"    { return PLUS ;}
 "."    { return POINT ; }
 "*"    { return ETOILE ; }
@@ -18,8 +18,3 @@
 ")"    {return PAR_F;}
 
 %%
-// Juste pour tester avant.
-int main() {
-	yylex();
-	return 0;
-}
