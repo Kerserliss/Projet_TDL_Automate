@@ -7,7 +7,7 @@
 
 %% 
 [a-c] { yylval.str = strdup(yytext); return LETTRE;}
-[ \t] {;} // ignore les espaces 
+[ \t\r] {;} // ignore les espaces et retours chariot
 [\n] { return LIGNE;}
 
 

@@ -86,6 +86,7 @@ def concatenation(a1, a2):
 
     for etat_final in a1.final : 
         a.ajoute_transition(etat_final, 'E', [a1.n])
+
     return a
 
 
@@ -101,12 +102,13 @@ def union(a1, a2):
 
     for trans in a1.transition : 
         q, lettre = trans 
-        a.transition[(q+1+a1.n, lettre)] = [d+1+a1.n for d in a1.transition[trans]]
+        a.transition[(q+1, lettre)] = [d+1 for d in a1.transition[trans]]
     
     for trans in a2.transition : 
         q, lettre = trans 
         a.transition[(q+1+a1.n, lettre)] = [d+1+a1.n for d in a2.transition[trans]]
     a.ajoute_transition(0, 'E', [1, 1+a1.n])
+
     return a
 
 
@@ -117,6 +119,7 @@ def etoile(a):
     a = cp.deepcopy(a)
     for etat in a.final :
         a.ajoute_transition(etat,'E',[0])
+
     return a
 
 
@@ -215,6 +218,7 @@ def completion(a):
         for lettre in a.alphabet : 
             if (q, lettre) not in a.transition :
                 a.transition[(q, lettre)] = [etat_poub]
+
     return a
 
 
@@ -289,19 +293,24 @@ def egal(a1, a2):
     """ retourne True si a1 et a2 sont isomorphes
         a1 et a2 doivent être minimaux
     """
+
     if a1.n != a2.n :
         return False
     if sorted(a1.final) != sorted(a2.final) :
         return False
     else :
-        for n in a1.n :
-            for lettre in 'abc' :
-                transi = (n,lettre)
-                if (transi in a1.transition.keys() and transi not in a2.transition.keys()) or (transi not in a1.transition.keys() and transi in a2.transition.keys()):
+        for trans in a1.transition.keys() :
+            if trans not in a2.transition.keys():
+                return False
+            else :
+                if sorted(a1.transition[trans]) != sorted(a2.transition[trans]) :
                     return False
-                else :
-                    if sorted(a1.transition[transi]) != sorted(a2.transition[transi]):
-                        return False
+        for trans2 in a2.transition.keys() :
+            if trans2 not in a1.transition.keys():
+                return False
+            else :
+                if sorted(a1.transition[trans]) != sorted(a2.transition[trans]) :
+                    return False
                 
     return True
 
