@@ -119,6 +119,7 @@ def etoile(a):
     a = cp.deepcopy(a)
     for etat in a.final :
         a.ajoute_transition(etat,'E',[0])
+    a.final = sorted(a.final + [0])
 
     return a
 
@@ -344,5 +345,116 @@ print(a_complet)
 print(a_complet1)
 print(a_complet2)
 
+def test_etoile():
+    """
+    TEST N°1
+    On teste l'étoile de Kleene de l'automate reconnaissant a
+    """
+    a1 = automate("a")
+    a = etoile(a1)
+    # Assert permet de lever une assertion error si jamais ce qu'il evalue est faux, cela permet de tester les fonctions 
+    
+    assert a.n == a1.n # Vérifie que c'est le même nombre d'état, on en rajoute pas 
+    assert a.final == [0,1] # On vérifie que c'est bien le même état final ainsi que l'état 0
+    assert (1, "E") in a.transition # On verifie que la transition de etat final epsilon existe
+    assert a.transition[(1, "E")] == [0] # On vérifie que la transition renvoie bien vers l'état epsilon. 
 
+    """
+    TEST N°2
+    On teste l'étoile de Kleene de l'automate reconnaissant aa
+    """
+
+    # Ici on reprends la même idée de ce qui a été écrit au dessus, mais on crée notre automate de base nous même
+    a1 = automate("a")
+    a1.n = 3
+    a1.final = [2] 
+    a1.transition = {(0, "a"): [1], (1, "a"): [2]}
+    a = etoile(a1)
+
+    # Même commentaire
+    assert a.n == 3
+    assert a.final == [0,2]
+    assert (2, "E") in a.transition
+    assert a.transition[(2, "E")] == [0]
+
+
+def test_determinisation():
+    """
+    TEST N°1
+    On teste la determination d'un automate non deterministe ab+a
+    """
+    a = automate("a")
+    a.ajoute_transition(0,"a",[1]) # Premier cas a
+    a.ajoute_transition(0,"a",[2]) # Deuxième cas : a pour ensuite b
+    a.ajoute_transition(2,"b",[3]) # 2 vers 3 avec b
+    a.final = [1,3]
+    a.n = 4
+    a = determinisation(a)
+    assert a.n == 3 # L'etat 1 et 2 sont regroupés ensemble donc on perd un état
+    assert a.final == [1, 2] # 1 et 2 parce qu'on a le cas juste a et le cas ab
+    assert (0, "a") in a.transition 
+    assert a.transition[(0, "a")] == [1]
+    assert a.transition[(1, "b")] == [2]
+
+    """
+    TEST N°2
+    On teste la déterminisation d'un automate déterministe par exemple juste b.
+    """
+    a = automate("b")
+    a = determinisation(a)
+    assert a.n == 2 # On change pas de nombre d'etat
+    assert a.final == [1] # On change pas l'état final
+    assert (0, "b") in a.transition # On a bien l'unique transition b
+    assert a.transition[(0, "b")] == [1] # Qui mène bien vers 1
+
+def test_egal():
+    """
+    TEST N°1 
+    On test l'égalité entre deux automates qui sont simplement a et a
+    """
+    # Creation des deux automates
+    a1 = automate("a") 
+    a2 = automate("a")
+
+    # On fait tout comme on le ferait
+    a1 = tout_faire(a1)
+    a2 = tout_faire(a2)
+    # On verifie l'egalité dans les deux sens
+    assert egal(a1, a2)
+    assert egal(a2, a1)
+
+    """
+    TEST N°2
+    On test l'égalité entre deux automates différents comme acb et bc
+    """
+
+    a1 = automate("a")
+    a2 = automate("b")
+
+    #Definition du premier automate
+    a1.n = 4
+    a1.final = [3]
+    a1.ajoute_transition(0, "a", [1])
+    a1.ajoute_transition(1, "b", [2])
+    a1.ajoute_transition(2, "c", [3])
+
+    #Definition du deuxième automate
+
+    a2.n = 3
+    a2.final = [2]
+    a1.ajoute_transition(0, "b", [1])
+    a1.ajoute_transition(1, "c", [2])
+
+    # On fait tout comme indiqué
+    a1 = tout_faire(a1)
+    a2 = tout_faire(a2)
+
+    #On fait notre égalité
+    assert not egal(a1, a2)
+    assert not egal(a2, a1)
+
+if __name__ == "__main__":
+    test_etoile()
+    test_egal()
+    test_determinisation()
 
