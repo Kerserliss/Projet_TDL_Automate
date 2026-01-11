@@ -1,6 +1,6 @@
 %{
 
-#include "operateur_bison.tab.h"
+#include "regexp.tab.h"
 // Fichier qui genere et stock les tokens
 
 %}
