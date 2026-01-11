@@ -251,6 +251,18 @@ def egal(a1, a2):
     """
     if a1.n != a2.n :
         return False
+    if sorted(a1.final) != sorted(a2.final) :
+        return False
+    else :
+        for n in a1.n :
+            for lettre in 'abc' :
+                transi = (n,lettre)
+                if (transi in a1.transition.keys() and transi not in a2.transition.keys()) or (transi not in a1.transition.keys() and transi in a2.transition.keys()):
+                    return False
+                else :
+                    if sorted(a1.transition[transi]) != sorted(a2.transition[transi]):
+                        return False
+                
     return True
 
 
