@@ -505,4 +505,7 @@ if __name__ == "__main__":
     test_etoile()
     test_egal()
     test_determinisation()
+    test_completion()
+    test_concatenation()
+    test_union()
 
