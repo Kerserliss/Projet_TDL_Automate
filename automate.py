@@ -69,12 +69,44 @@ class automate:
 def concatenation(a1, a2): 
     """Retourne l'automate qui reconnaît la concaténation des 
     langages reconnus par les automates a1 et a2"""
+
+    a1 = cp.deepcopy(a1)
+    a2 = cp.deepcopy(a2)
+    a = automate()
+    a.name = a1.name + " " + a2.name 
+    a.n = a1.n + a2.n
+    a.final = [q + a1.n for q in a2.final]
+
+    for trans in a1.transition:
+        a.transition[trans] = list(a1.transition[trans])
+
+    for trans in a2.transition :
+        q, lettre = trans
+        a.transition[(q+a1.n, lettre)] = [d+ a1.n for d in a2.transition[trans]]
+
+    for etat_final in a1.final : 
+        a.ajoute_transition(etat_final, 'E', [a1.n])
     return a
 
 
 def union(a1, a2):
     """Retourne l'automate qui reconnaît l'union des 
     langages reconnus par les automates a1 et a2""" 
+    a1 = cp.deepcopy(a1)
+    a2 = cp.deepcopy(a2)
+    a = automate()
+    a.name = a1.name + " " + a2.name
+    a.n = 1 + a1.n + a2.n
+    a.final = [q+1 for q in  a1.final] + [q+1+ a1.n for q in a2.final]
+
+    for trans in a1.transition : 
+        q, lettre = trans 
+        a.transition[(q+1+a1.n, lettre)] = [d+1+a1.n for d in a1.transition[trans]]
+    
+    for trans in a2.transition : 
+        q, lettre = trans 
+        a.transition[(q+1+a1.n, lettre)] = [d+1+a1.n for d in a2.transition[trans]]
+    a.ajoute_transition(0, 'E', [1, 1+a1.n])
     return a
 
 
@@ -175,6 +207,14 @@ def completion(a):
     """ retourne l'automate a complété
         l'automate en entrée doit être déterministe
     """
+    a = cp.deepcopy(a)
+    etat_poub = a.n
+    a.n+= 1
+
+    for q in range(a.n) :
+        for lettre in a.alphabet : 
+            if (q, lettre) not in a.transition :
+                a.transition[(q, lettre)] = [etat_poub]
     return a
 
 
