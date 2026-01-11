@@ -90,7 +90,12 @@ instruction :
 		fclose(fpython);
 		Freeprogramme(Programme_G);
 
-	};
+	}
+	| instruction LIGNE
+	{
+		// Ignore les lignes vides après l'instruction
+	}
+	;
 
 expression : 
 	PAR_O expression PAR_F {
@@ -112,7 +117,7 @@ expression :
 		$$ = numero-1;
 	}
 	|
-	expression POINT expression {
+	expression POINT expression %prec POINT {
 
 		// Creation du nom de l automate
 		char merge[8];
@@ -125,8 +130,23 @@ expression :
 		Add_to_Prog(Programme_G, buffer);
 
 		$$ = numero -1;
+	} 
+	|
+	expression expression %prec POINT{
+
+		// Creation du nom de l automate
+		char merge[8];
+		sprintf(merge, "a%d", numero);
+		numero++;
+
+		// Creation de la ligne correspondante
+		char buffer[64];
+		sprintf(buffer, "%s = concatenation(a%d, a%d)\n", merge, $1, $2);
+		Add_to_Prog(Programme_G, buffer);
+
+		$$ = numero -1;
 	}
-	| 
+	|
 	expression PLUS expression {
 
 		// Creation du nom de l'automate
@@ -149,12 +169,10 @@ expression :
 		Add_to_Prog(Programme_G, buffer);
 		numero++;
 		$$ = numero - 1;  // On renvoie le numero precedent
-	}
+	}	
 	;
 
 %%
-
-Programme* Programme_G;
 
 int main(void) {
     Programme_G = Initprogramme();

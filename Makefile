@@ -8,7 +8,7 @@ $(TARGET) : regexp.tab.c regexp.yy.c
 	$(CC) $(CFLAGS) -o $@ $^ ${LDFLAGS} -lfl
 
 regexp.tab.c regexp.tab.h : regexp.y
-	bison -d -v $^
+	bison -d -v -Wno-conflicts-sr -Wno-conflicts-rr $^
 
 regexp.yy.c : regexp.l
 	flex -o $@ $^
