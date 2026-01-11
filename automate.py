@@ -70,22 +70,22 @@ def concatenation(a1, a2):
     """Retourne l'automate qui reconnaît la concaténation des 
     langages reconnus par les automates a1 et a2"""
 
-    a1 = cp.deepcopy(a1)
+    a1 = cp.deepcopy(a1) #on copie l'automate pour éviter les effets de bord
     a2 = cp.deepcopy(a2)
     a = automate()
     a.name = a1.name + " " + a2.name 
-    a.n = a1.n + a2.n
-    a.final = [q + a1.n for q in a2.final]
+    a.n = a1.n + a2.n #on définit le nombre d'états de l'automate concaténé
+    a.final = [q + a1.n for q in a2.final] #on définit les états finaux comme étant les états finaux de a2 avec un décalage de numérotation
 
     for trans in a1.transition:
-        a.transition[trans] = list(a1.transition[trans])
+        a.transition[trans] = list(a1.transition[trans])#on ajoute les transitions de a1
 
     for trans in a2.transition :
         q, lettre = trans
-        a.transition[(q+a1.n, lettre)] = [d+ a1.n for d in a2.transition[trans]]
+        a.transition[(q+a1.n, lettre)] = [d+ a1.n for d in a2.transition[trans]]#on ajote les transitions de a2 avec un décalage de numérotation pour ne pas superposer les numéros 
 
     for etat_final in a1.final : 
-        a.ajoute_transition(etat_final, 'E', [a1.n])
+        a.ajoute_transition(etat_final, 'E', [a1.n])#on créer des nouvelles transitions depuis les etats finaux de a1 jusqu'à l'etat initial de a2
 
     return a
 
@@ -93,21 +93,22 @@ def concatenation(a1, a2):
 def union(a1, a2):
     """Retourne l'automate qui reconnaît l'union des 
     langages reconnus par les automates a1 et a2""" 
-    a1 = cp.deepcopy(a1)
+    a1 = cp.deepcopy(a1)#on copie l'automate pour éviter les effets de bords
     a2 = cp.deepcopy(a2)
     a = automate()
     a.name = a1.name + " " + a2.name
-    a.n = 1 + a1.n + a2.n
-    a.final = [q+1 for q in  a1.final] + [q+1+ a1.n for q in a2.final]
+    a.n = 1 + a1.n + a2.n #on rajoute un etat initial 1 pour l'union
+    a.final = [q+1 for q in  a1.final] + [q+1+ a1.n for q in a2.final] #les etats finaux de a sont ceux de a1 et a2 mais avec un décalage de numérotation car on a rajouter un état
 
     for trans in a1.transition : 
         q, lettre = trans 
-        a.transition[(q+1, lettre)] = [d+1 for d in a1.transition[trans]]
+        a.transition[(q+1, lettre)] = [d+1 for d in a1.transition[trans]]#on rajoute les transition de a1 dans a mais avec un décalage pour cause de décalage de numérotation
     
     for trans in a2.transition : 
         q, lettre = trans 
         a.transition[(q+1+a1.n, lettre)] = [d+1+a1.n for d in a2.transition[trans]]
-    a.ajoute_transition(0, 'E', [1, 1+a1.n])
+
+    a.ajoute_transition(0, 'E', [1, 1+a1.n])#on créer les transitions du nouvel état initial de a aux étst initiaux de a1 et a2
 
     return a
 
@@ -211,14 +212,14 @@ def completion(a):
     """ retourne l'automate a complété
         l'automate en entrée doit être déterministe
     """
-    a = cp.deepcopy(a)
-    etat_poub = a.n
-    a.n+= 1
+    a = cp.deepcopy(a)#on copie l'automate pour éviter les effets de bord
+    etat_poub = a.n #on stock le numéro du nouvel état 
+    a.n+= 1 #on incrémente 1 aux états car on rajoute l'état poubelle 
 
     for q in range(a.n) :
         for lettre in a.alphabet : 
             if (q, lettre) not in a.transition :
-                a.transition[(q, lettre)] = [etat_poub]
+                a.transition[(q, lettre)] = [etat_poub]#on définit les transitions allant jusqu'à l'état poubelle
 
     return a
 
@@ -325,10 +326,10 @@ def test_concatenation():
     a2 = automate("b")
     a = concatenation(a1, a2)
 
-    assert a.n == 4 
-    assert a.final == [3]
-    assert(1, "E") in a.transition
-    assert a.transition[(1, "E")] == [2]
+    assert a.n == 4 #on vérifier que le nombre d'états est 4
+    assert a.final == [3] #on vérifie que l'état final est 3 
+    assert(1, "E") in a.transition #on vérifier que la transition espilon existe
+    assert a.transition[(1, "E")] == [2]#on vérifie que la transition epsilon va bien vers 2 
     print("test 1 réussi a.b")
 
     a3 = automate("c")
@@ -379,12 +380,12 @@ def test_union():
     a2 = automate("b")
     a = union(a1, a2)
 
-    assert a.n == 5
-    assert sorted(a.final) == [2,4]
-    assert (0,"E") in a.transition
-    assert len(a.transition[(0,"E")]) == 2
-    assert 1 in a.transition[(0,"E")]
-    assert 3 in a.transition[(0, "E")]
+    assert a.n == 5 #on verifie que le nombre d'états est de 5
+    assert sorted(a.final) == [2,4] #on vérifie les états finaux sont 2 et 4
+    assert (0,"E") in a.transition #on vérifie que la transition epsilon depuis 0 existe
+    assert len(a.transition[(0,"E")]) == 2 #on vérifie qu'il y a 2 transitions epsilon depuis 0
+    assert 1 in a.transition[(0,"E")] #on vérifie que la transition allant de 0 à 1 existe
+    assert 3 in a.transition[(0, "E")]#on vérifie que la transition allant de 0 à 3 existe 
     print("test 1 reussi")
 
     a3 = automate("c")
@@ -404,12 +405,12 @@ def test_completion():
     a1 = automate("a")
     a = completion(a1)
 
-    assert a.n == 3
-    assert a.final == [1]
+    assert a.n == 3 #on vérifie le nombre d'états est 3
+    assert a.final == [1]  #on vérifie que l'éat final est 1
 
     for q in range(a.n):
         for lettre in ["a", "b", "c"]:
-            assert(q, lettre) in a.transition
+            assert(q, lettre) in a.transition#on vérifie qu'il y a bien toute les transitions
     print("test 1 reussi")
 
     a2 = automate("b")
@@ -423,7 +424,7 @@ def test_completion():
             assert(q, lettre) in a.transition
     print("test 2 reussis")
 
-    
+
 
 
 def test_determinisation():
