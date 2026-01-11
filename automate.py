@@ -322,14 +322,27 @@ def egal(a1, a2):
 
 a1 = automate("a")
 a2 = automate("b")
+a3 = automate("c")
 a_concat = concatenation(a1,a2)
+a_concat1 = concatenation(a1, a3)
+a_concat2 = concatenation(a2, a3)
 print(a_concat)
+print(a_concat1)
+print(a_concat2)
 
 #test union 
 a_union = union(a1,a2)
+a_union1 = union(a1,a3)
+a_union2 = union(a2,a3)
 print(a_union)
 
 #test complementation
 a_complet = completion(a1)
+a_complet1 = completion(a2)
+a_complet2 = completion(a3)
 print(a_complet)
+print(a_complet1)
+print(a_complet2)
+
+
 
