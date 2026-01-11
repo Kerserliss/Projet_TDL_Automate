@@ -3,3 +3,5 @@
 #define ETOILE 103
 #define PAR_O 104
 #define PAR_F 105
+#define LETTRE 106
+#define LIGNE
