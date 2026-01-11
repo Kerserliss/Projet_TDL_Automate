@@ -308,4 +308,19 @@ def egal(a1, a2):
 
 
 # TESTS
-# à écrire  
+
+#test concatenation 
+
+a1 = automate("a")
+a2 = automate("b")
+a_concat = concatenation(a1,a2)
+print(a_concat)
+
+#test union 
+a_union = union(a1,a2)
+print(a_union)
+
+#test complementation
+a_complet = completion(a1)
+print(a_complet)
+
