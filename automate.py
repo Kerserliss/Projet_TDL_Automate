@@ -319,31 +319,26 @@ def egal(a1, a2):
 
 # TESTS
 
-#test concatenation 
+def test_concatenation():
+    """test de la fonction concaténatinon de 2 automates"""
+    a1 = automate("a")
+    a2 = automate("b")
+    a = concatenation(a1, a2)
 
-a1 = automate("a")
-a2 = automate("b")
-a3 = automate("c")
-a_concat = concatenation(a1,a2)
-a_concat1 = concatenation(a1, a3)
-a_concat2 = concatenation(a2, a3)
-print(a_concat)
-print(a_concat1)
-print(a_concat2)
+    assert a.n == 4 
+    assert a.final == [3]
+    assert(1, "E") in a.transition
+    assert a.transition[(1, "E")] == [2]
+    print("test 1 réussi a.b")
 
-#test union 
-a_union = union(a1,a2)
-a_union1 = union(a1,a3)
-a_union2 = union(a2,a3)
-print(a_union)
-
-#test complementation
-a_complet = completion(a1)
-a_complet1 = completion(a2)
-a_complet2 = completion(a3)
-print(a_complet)
-print(a_complet1)
-print(a_complet2)
+    a3 = automate("c")
+    a = concatenation(a1,a3)
+    
+    assert a.n == 4
+    assert a.final == [3]
+    assert(1, "E") in a.transition
+    assert a.transition[(1, "E")] == [2]
+    print("test 2 reussi")
 
 def test_etoile():
     """
@@ -376,6 +371,59 @@ def test_etoile():
     assert a.final == [0,2]
     assert (2, "E") in a.transition
     assert a.transition[(2, "E")] == [0]
+
+
+def test_union():
+    """test de la fonction union sur 2 automates"""
+    a1 = automate("a")
+    a2 = automate("b")
+    a = union(a1, a2)
+
+    assert a.n == 5
+    assert sorted(a.final) == [2,4]
+    assert (0,"E") in a.transition
+    assert len(a.transition[(0,"E")]) == 2
+    assert 1 in a.transition[(0,"E")]
+    assert 3 in a.transition[(0, "E")]
+    print("test 1 reussi")
+
+    a3 = automate("c")
+    a = union(a2,a3)
+
+    assert a.n == 5
+    assert sorted(a.final) == [2,4]
+    assert (0, "E") in a.transition
+    assert len(a.transition[(0, "E")]) == 2
+    assert 1 in a.transition[(0, "E")]
+    assert 3 in a.transition[(0, "E")]
+    print("test 2 reussis ")
+
+def test_completion():
+    """test de la fonction completion d'un automate"""
+
+    a1 = automate("a")
+    a = completion(a1)
+
+    assert a.n == 3
+    assert a.final == [1]
+
+    for q in range(a.n):
+        for lettre in ["a", "b", "c"]:
+            assert(q, lettre) in a.transition
+    print("test 1 reussi")
+
+    a2 = automate("b")
+    a = completion(a2)
+
+    assert a.n == 3
+    assert a.final == [1]
+
+    for q in range(a.n):
+        for lettre in ["a", "b", "c"]:
+            assert(q, lettre) in a.transition
+    print("test 2 reussis")
+
+    
 
 
 def test_determinisation():
